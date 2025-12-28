@@ -1,0 +1,29 @@
+name: Test Pull Request
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # For local testing with act, just test pull and change detection
+      - name: Pull and create PR
+        id: pr
+        uses: ./
+        with:
+          action: pull-request
+          api_key: ${{ secrets.TEAAAMS_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "test: translation sync"
+          pr_branch: "test/translations-update"
+          pr_labels: "test,translations"
+
+      - name: Show result
+        run: |
+          echo "Has changes: ${{ steps.pr.outputs.has_changes }}"
+          echo "PR URL: ${{ steps.pr.outputs.pr_url }}"
+          echo "PR Number: ${{ steps.pr.outputs.pr_number }}"

@@ -1,0 +1,16 @@
+bin
+
+# Local config (use teaaams.yaml.example as template)
+teaaams.yaml
+.secrets
+.env
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

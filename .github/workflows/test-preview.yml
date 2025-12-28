@@ -1,0 +1,24 @@
+name: Test Preview
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Preview translations
+        id: preview
+        uses: ./
+        with:
+          action: preview
+          api_key: ${{ secrets.TEAAAMS_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show result
+        run: |
+          echo "=== Preview Output ==="
+          echo "${{ steps.preview.outputs.preview_output }}"
