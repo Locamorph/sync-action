@@ -130,12 +130,36 @@ Upload translations from your repository to Teaaams.
 
 Download translations and automatically create a pull request.
 
+> **Required Permissions**
+>
+> Add these permissions to your workflow for the `GITHUB_TOKEN` to push branches and create PRs:
+> ```yaml
+> permissions:
+>   contents: write
+>   pull-requests: write
+> ```
+>
+> You may also need to enable write permissions in your settings:
+>
+> **Repository level:** Settings → Actions → General → Workflow permissions → Select "Read and write permissions"
+>
+> **Organization level:** Organization Settings → Actions → General → Workflow permissions → Select "Read and write permissions"
+>
+> If you can't enable these settings (restricted by org policy), use a **Personal Access Token (PAT)** instead:
+> 1. Create a PAT with `repo` scope: **GitHub** → **Settings** → **Developer settings** → **Personal access tokens**
+> 2. Add it as a repository secret (e.g., `PAT_TOKEN`)
+> 3. Use `github_token: ${{ secrets.PAT_TOKEN }}` in your workflow
+
 ```yaml
 name: Sync Translations
 on:
   schedule:
     - cron: '0 0 * * *'  # Daily
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   sync:
@@ -152,6 +176,7 @@ jobs:
           # Optional: customize PR (all fields below have defaults or are optional)
           pr_title: "chore: update translations"       # default: "chore: update translations"
           pr_branch: "teaaams/translations-update"     # default: "teaaams/translations-update"
+          pr_base: "main"                              # default: repo default branch
           pr_labels: "translations,automated,i18n"     # optional
           pr_reviewers: "reviewer1,reviewer2"          # optional
           pr_assignees: "assignee1"                    # optional
@@ -213,6 +238,7 @@ Translations added:
 | `github_token` | For PR/preview | - | GitHub token for PR creation or commenting |
 | `pr_title` | No | `chore: update translations` | PR title |
 | `pr_branch` | No | `teaaams/translations-update` | PR branch name |
+| `pr_base` | No | repo default | Base branch for PR (e.g., `main`, `develop`) |
 | `pr_body` | No | - | PR body/description |
 | `pr_labels` | No | - | Comma-separated labels (e.g., `translations,automated`) |
 | `pr_reviewers` | No | - | Comma-separated reviewer usernames |
