@@ -1,11 +1,11 @@
-# Teaaams Sync GitHub Action
+# Locamorph Sync GitHub Action
 
-Sync translations with [Teaaams](https://teaaams.com) in your CI/CD workflows.
+Sync translations with [Locamorph](https://locamorph.com) in your CI/CD workflows.
 
 ## Features
 
-- **Pull** - Download translations from Teaaams
-- **Push** - Upload translations to Teaaams
+- **Pull** - Download translations from Locamorph
+- **Push** - Upload translations to Locamorph
 - **Pull Request** - Download translations and create a PR
 - **Preview** - Dry-run push and comment results on PR
 
@@ -13,30 +13,30 @@ Sync translations with [Teaaams](https://teaaams.com) in your CI/CD workflows.
 
 ```yaml
 - name: Sync translations
-  uses: teaaams/sync-action@v1
+  uses: Locamorph/sync-action@v1
   with:
     action: pull
-    api_key: ${{ secrets.TEAAAMS_API_KEY }}
+    api_key: ${{ secrets.LOCAMORPH_API_KEY }}
 ```
 
 ## Configuration
 
-This action reads all settings from `teaaams.yaml` in your repository root. **No configuration is passed via action inputs** - only the API key and action type.
+This action reads all settings from `locamorph.yaml` in your repository root. **No configuration is passed via action inputs** - only the API key and action type.
 
 ### Quick Setup
 
 Initialize your project configuration using the CLI:
 
 ```bash
-npx @teaaams/cli init --api-key YOUR_API_KEY
+npx @locamorph/cli init --api-key YOUR_API_KEY
 ```
 
-This will interactively create a `teaaams.yaml` file in your project root.
+This will interactively create a `locamorph.yaml` file in your project root.
 
-### Configuration File: `teaaams.yaml`
+### Configuration File: `locamorph.yaml`
 
 ```yaml
-# Required: Your Teaaams project UUID
+# Required: Your Locamorph project UUID
 project_id: "c1627915-1d88-4dbc-97a0-8c23a3c84763"
 
 # File settings
@@ -98,32 +98,32 @@ Default values will be used for everything else:
 - `format`: `json`
 - `file_structure`: `{LANG_ISO}.{FORMAT}`
 
-See [@teaaams/cli documentation](https://www.npmjs.com/package/@teaaams/cli) for full configuration options.
+See [@locamorph/cli documentation](https://www.npmjs.com/package/@locamorph/cli) for full configuration options.
 
 ## Actions
 
 ### Pull Translations
 
-Download translations from Teaaams to your repository.
+Download translations from Locamorph to your repository.
 
 ```yaml
 - name: Pull translations
-  uses: teaaams/sync-action@v1
+  uses: Locamorph/sync-action@v1
   with:
     action: pull
-    api_key: ${{ secrets.TEAAAMS_API_KEY }}
+    api_key: ${{ secrets.LOCAMORPH_API_KEY }}
 ```
 
 ### Push Translations
 
-Upload translations from your repository to Teaaams.
+Upload translations from your repository to Locamorph.
 
 ```yaml
 - name: Push translations
-  uses: teaaams/sync-action@v1
+  uses: Locamorph/sync-action@v1
   with:
     action: push
-    api_key: ${{ secrets.TEAAAMS_API_KEY }}
+    api_key: ${{ secrets.LOCAMORPH_API_KEY }}
 ```
 
 ### Pull Request
@@ -168,14 +168,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Sync translations
-        uses: teaaams/sync-action@v1
+        uses: Locamorph/sync-action@v1
         with:
           action: pull-request
-          api_key: ${{ secrets.TEAAAMS_API_KEY }}
+          api_key: ${{ secrets.LOCAMORPH_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Optional: customize PR (all fields below have defaults or are optional)
           pr_title: "chore: update translations"       # default: "chore: update translations"
-          pr_branch: "teaaams/translations-update"     # default: "teaaams/translations-update"
+          pr_branch: "locamorph/translations-update"     # default: "locamorph/translations-update"
           pr_base: "main"                              # default: repo default branch
           pr_labels: "translations,automated,i18n"     # optional
           pr_reviewers: "reviewer1,reviewer2"          # optional
@@ -201,10 +201,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Preview translation changes
-        uses: teaaams/sync-action@v1
+        uses: Locamorph/sync-action@v1
         with:
           action: preview
-          api_key: ${{ secrets.TEAAAMS_API_KEY }}
+          api_key: ${{ secrets.LOCAMORPH_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -234,10 +234,10 @@ Translations added:
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
 | `action` | Yes | - | Action to perform: `pull`, `push`, `pull-request`, or `preview` |
-| `api_key` | Yes | - | Teaaams API key |
+| `api_key` | Yes | - | Locamorph API key |
 | `github_token` | For PR/preview | - | GitHub token for PR creation or commenting |
 | `pr_title` | No | `chore: update translations` | PR title |
-| `pr_branch` | No | `teaaams/translations-update` | PR branch name |
+| `pr_branch` | No | `locamorph/translations-update` | PR branch name |
 | `pr_base` | No | repo default | Base branch for PR (e.g., `main`, `develop`) |
 | `pr_body` | No | - | PR body/description |
 | `pr_labels` | No | - | Comma-separated labels (e.g., `translations,automated`) |

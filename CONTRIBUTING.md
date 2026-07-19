@@ -22,32 +22,32 @@ choco install act-cli
 
 1. Copy the example config:
    ```bash
-   cp teaaams.yaml.example teaaams.yaml
+   cp locamorph.yaml.example locamorph.yaml
    ```
 
-2. Edit `teaaams.yaml` with your project ID:
+2. Edit `locamorph.yaml` with your project ID:
    ```yaml
    project_id: "your-project-uuid"
    ```
 
-3. Get your API key from [Teaaams Dashboard](https://teaaams.com)
+3. Get your API key from [Locamorph Dashboard](https://locamorph.com)
 
 ## Running Tests Locally
 
-**Important:** Use `--bind` flag to mount your local directory (including `teaaams.yaml`):
+**Important:** Use `--bind` flag to mount your local directory (including `locamorph.yaml`):
 
 ```bash
 # Test pull action
-act -W .github/workflows/test-pull.yml --bind -s TEAAAMS_API_KEY=your_api_key
+act -W .github/workflows/test-pull.yml --bind -s LOCAMORPH_API_KEY=your_api_key
 
 # Test push action
-act -W .github/workflows/test-push.yml --bind -s TEAAAMS_API_KEY=your_api_key
+act -W .github/workflows/test-push.yml --bind -s LOCAMORPH_API_KEY=your_api_key
 
 # Test preview action
-act -W .github/workflows/test-preview.yml --bind -s TEAAAMS_API_KEY=your_api_key -s GITHUB_TOKEN=your_github_token
+act -W .github/workflows/test-preview.yml --bind -s LOCAMORPH_API_KEY=your_api_key -s GITHUB_TOKEN=your_github_token
 
 # Test pull-request action
-act -W .github/workflows/test-pull-request.yml --bind -s TEAAAMS_API_KEY=your_api_key -s GITHUB_TOKEN=your_github_token
+act -W .github/workflows/test-pull-request.yml --bind -s LOCAMORPH_API_KEY=your_api_key -s GITHUB_TOKEN=your_github_token
 ```
 
 ### Using a Secrets File
@@ -55,7 +55,7 @@ act -W .github/workflows/test-pull-request.yml --bind -s TEAAAMS_API_KEY=your_ap
 Create `.secrets` file (already in `.gitignore`):
 
 ```bash
-TEAAAMS_API_KEY=your_api_key
+LOCAMORPH_API_KEY=your_api_key
 GITHUB_TOKEN=your_github_token
 ```
 
@@ -74,11 +74,11 @@ act -W .github/workflows/test-pull.yml --bind --secret-file .secrets
 - PR creation can only be fully tested on GitHub Actions
 
 **"No project ID found"**
-- Make sure `teaaams.yaml` exists in the project root
+- Make sure `locamorph.yaml` exists in the project root
 - Use `--bind` flag to mount local files into the container
 
 **"localhost" API not reachable**
-- Use `host.docker.internal` instead of `localhost` in your `teaaams.yaml`
+- Use `host.docker.internal` instead of `localhost` in your `locamorph.yaml`
 - Example: `api_url: "http://host.docker.internal:8080"`
 
 **"Docker not running"**
@@ -93,12 +93,12 @@ You can also test the CLI commands directly:
 
 ```bash
 # Install CLI
-npm install -g @teaaams/cli
+npm install -g @locamorph/cli
 
 # Set API key
-export TEAAAMS_API_KEY=your_api_key
+export LOCAMORPH_API_KEY=your_api_key
 
 # Test commands
-teaaams download --dryrun
-teaaams upload --dryrun --verbose
+locamorph download --dryrun
+locamorph upload --dryrun --verbose
 ```
