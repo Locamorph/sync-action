@@ -38,6 +38,10 @@ inputs:
   pr_assignees:
     description: 'Comma-separated assignee usernames'
     required: false
+  comment_on_no_changes:
+    description: 'Comment on the PR even when the preview finds no translation changes (preview action only)'
+    required: false
+    default: 'true'
 
 outputs:
   has_changes:
@@ -50,7 +54,7 @@ outputs:
     description: 'PR number (pull-request action only)'
     value: ${{ steps.create-pr.outputs.pull-request-number }}
   preview_output:
-    description: 'Dry-run output (preview action only)'
+    description: 'Markdown body of the preview comment (preview action only)'
     value: ${{ steps.preview.outputs.preview_output }}
 
 runs:
@@ -65,7 +69,7 @@ runs:
     - name: Install Locamorph CLI
       shell: bash
       run: |
-        npm install -g @locamorph/cli@latest
+        npm install -g "@locamorph/cli@^1.1.0"
         echo "Installed locamorph CLI version: $(locamorph --version)"
 
     # Action: pull
@@ -82,7 +86,26 @@ runs:
       shell: bash
       env:
         LOCAMORPH_API_KEY: ${{ inputs.api_key }}
-      run: locamorph upload --verbose
+        LOCAMORPH_COMMIT_SHA: ${{ github.sha }}
+      run: |
+        JSON_LOG="$RUNNER_TEMP/locamorph-push.json"
+        ERR_LOG="$RUNNER_TEMP/locamorph-push.err"
+
+        EXIT_CODE=0
+        locamorph upload --json >"$JSON_LOG" 2>"$ERR_LOG" || EXIT_CODE=$?
+        cat "$ERR_LOG" >&2
+
+        if [ $EXIT_CODE -ne 0 ]; then
+          cat "$JSON_LOG" "$ERR_LOG" > "$RUNNER_TEMP/locamorph-push-combined.log"
+          "$GITHUB_ACTION_PATH/scripts/report-failure.sh" \
+            "locamorph upload" "$EXIT_CODE" \
+            "$RUNNER_TEMP/locamorph-push-combined.log"
+          exit $EXIT_CODE
+        fi
+
+        node "$GITHUB_ACTION_PATH/scripts/build-comment.js" \
+          "$JSON_LOG" "$RUNNER_TEMP/locamorph-push-summary.md" || \
+          echo "::warning::Could not render the push summary."
 
     # Action: pull-request
     - name: Pull translations and detect changes
@@ -134,45 +157,58 @@ runs:
       shell: bash
       env:
         LOCAMORPH_API_KEY: ${{ inputs.api_key }}
+        LOCAMORPH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       run: |
-        LOG="$RUNNER_TEMP/locamorph-preview.log"
+        JSON_LOG="$RUNNER_TEMP/locamorph-preview.json"
+        ERR_LOG="$RUNNER_TEMP/locamorph-preview.err"
+        BODY="$RUNNER_TEMP/locamorph-preview-comment.md"
 
-        # Stream the CLI output live so the real error is visible as it happens,
-        # while still capturing it for the PR comment and change detection.
-        locamorph upload --dryrun --verbose 2>&1 | tee "$LOG"
-        EXIT_CODE=${PIPESTATUS[0]}
-        OUTPUT=$(cat "$LOG")
+        # Keep stdout (the JSON payload) separate from stderr (progress and
+        # errors) so diagnostics never corrupt the JSON we parse.
+        EXIT_CODE=0
+        locamorph upload --dryrun --json >"$JSON_LOG" 2>"$ERR_LOG" || EXIT_CODE=$?
 
-        echo "preview_output<<LOCAMORPH_EOF" >> $GITHUB_OUTPUT
-        echo "$OUTPUT" >> $GITHUB_OUTPUT
-        echo "LOCAMORPH_EOF" >> $GITHUB_OUTPUT
-
-        if echo "$OUTPUT" | grep -qE "^\s+[+~-] \["; then
-          echo "has_preview_changes=true" >> $GITHUB_OUTPUT
-        else
-          echo "has_preview_changes=false" >> $GITHUB_OUTPUT
-        fi
+        # Surface the CLI's own diagnostics in the workflow log either way.
+        cat "$ERR_LOG" >&2
 
         if [ $EXIT_CODE -ne 0 ]; then
+          cat "$JSON_LOG" "$ERR_LOG" > "$RUNNER_TEMP/locamorph-preview-combined.log"
           "$GITHUB_ACTION_PATH/scripts/report-failure.sh" \
-            "locamorph upload --dryrun" "$EXIT_CODE" "$LOG"
+            "locamorph upload --dryrun" "$EXIT_CODE" \
+            "$RUNNER_TEMP/locamorph-preview-combined.log"
           exit $EXIT_CODE
         fi
 
+        # Builds the markdown body and sets has_preview_changes.
+        node "$GITHUB_ACTION_PATH/scripts/build-comment.js" "$JSON_LOG" "$BODY"
+
+        echo "preview_output<<LOCAMORPH_EOF" >> $GITHUB_OUTPUT
+        cat "$BODY" >> $GITHUB_OUTPUT
+        echo "LOCAMORPH_EOF" >> $GITHUB_OUTPUT
+        echo "comment_body_file=$BODY" >> $GITHUB_OUTPUT
+
+    # Find an existing preview comment so repeated pushes update one comment
+    - name: Find existing preview comment
+      if: inputs.action == 'preview' && github.event_name == 'pull_request'
+      id: find-comment
+      uses: peter-evans/find-comment@v3
+      with:
+        token: ${{ inputs.github_token }}
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: '<!-- locamorph-preview -->'
+
     - name: Comment preview on PR
-      if: inputs.action == 'preview' && github.event_name == 'pull_request' && steps.preview.outputs.has_preview_changes == 'true'
+      if: >-
+        inputs.action == 'preview' &&
+        github.event_name == 'pull_request' &&
+        (steps.preview.outputs.has_preview_changes == 'true' ||
+         inputs.comment_on_no_changes == 'true' ||
+         steps.find-comment.outputs.comment-id != '')
       uses: peter-evans/create-or-update-comment@v4
       with:
         token: ${{ inputs.github_token }}
         issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ## Translation Preview
-
-          This is a preview of what translations would be uploaded if this PR is merged.
-
-          ```
-          ${{ steps.preview.outputs.preview_output }}
-          ```
-
-          ---
-          *Generated by [Locamorph Sync Action](https://github.com/Locamorph/sync-action)*
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}
+        edit-mode: replace
+        body-path: ${{ steps.preview.outputs.comment_body_file }}
