@@ -182,10 +182,14 @@ runs:
         # Builds the markdown body and sets has_preview_changes.
         node "$GITHUB_ACTION_PATH/scripts/build-comment.js" "$JSON_LOG" "$BODY"
 
-        echo "preview_output<<LOCAMORPH_EOF" >> $GITHUB_OUTPUT
-        cat "$BODY" >> $GITHUB_OUTPUT
-        echo "LOCAMORPH_EOF" >> $GITHUB_OUTPUT
-        echo "comment_body_file=$BODY" >> $GITHUB_OUTPUT
+        # printf guarantees the closing delimiter starts on its own line even
+        # if $BODY has no trailing newline.
+        {
+          echo "preview_output<<LOCAMORPH_EOF"
+          printf '%s\n' "$(cat "$BODY")"
+          echo "LOCAMORPH_EOF"
+        } >> "$GITHUB_OUTPUT"
+        echo "comment_body_file=$BODY" >> "$GITHUB_OUTPUT"
 
     # Find an existing preview comment so repeated pushes update one comment
     - name: Find existing preview comment

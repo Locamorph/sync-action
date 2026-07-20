@@ -187,7 +187,10 @@ const total = data.total || { added: 0, updated: 0, removed: 0 };
 const changed = total.added + total.updated + total.removed;
 const body = buildBody(data);
 
-fs.writeFileSync(outPath, body);
+// Trailing newline is required: the workflow appends this file to
+// $GITHUB_OUTPUT via a heredoc, and the closing delimiter must sit on its own
+// line.
+fs.writeFileSync(outPath, body + '\n');
 
 // Summary for the workflow log, since --json replaces the CLI's own table.
 console.log(
