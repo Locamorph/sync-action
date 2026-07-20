@@ -92,13 +92,24 @@ runs:
       env:
         LOCAMORPH_API_KEY: ${{ inputs.api_key }}
       run: |
-        OUTPUT=$(locamorph download --verbose 2>&1) || true
-        echo "$OUTPUT"
+        LOG="$RUNNER_TEMP/locamorph-download.log"
+
+        # Stream the CLI output live so the real error is visible as it happens,
+        # while still capturing it for change detection.
+        locamorph download --verbose 2>&1 | tee "$LOG"
+        EXIT_CODE=${PIPESTATUS[0]}
+        OUTPUT=$(cat "$LOG")
 
         if echo "$OUTPUT" | grep -qE "^\s+[+~-] \["; then
           echo "has_changes=true" >> $GITHUB_OUTPUT
         else
           echo "has_changes=false" >> $GITHUB_OUTPUT
+        fi
+
+        if [ $EXIT_CODE -ne 0 ]; then
+          "$GITHUB_ACTION_PATH/scripts/report-failure.sh" \
+            "locamorph download" "$EXIT_CODE" "$LOG"
+          exit $EXIT_CODE
         fi
 
     - name: Create Pull Request
@@ -124,17 +135,28 @@ runs:
       env:
         LOCAMORPH_API_KEY: ${{ inputs.api_key }}
       run: |
-        OUTPUT=$(locamorph upload --dryrun --verbose 2>&1) || true
-        echo "$OUTPUT"
+        LOG="$RUNNER_TEMP/locamorph-preview.log"
 
-        echo "preview_output<<EOF" >> $GITHUB_OUTPUT
+        # Stream the CLI output live so the real error is visible as it happens,
+        # while still capturing it for the PR comment and change detection.
+        locamorph upload --dryrun --verbose 2>&1 | tee "$LOG"
+        EXIT_CODE=${PIPESTATUS[0]}
+        OUTPUT=$(cat "$LOG")
+
+        echo "preview_output<<LOCAMORPH_EOF" >> $GITHUB_OUTPUT
         echo "$OUTPUT" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        echo "LOCAMORPH_EOF" >> $GITHUB_OUTPUT
 
         if echo "$OUTPUT" | grep -qE "^\s+[+~-] \["; then
           echo "has_preview_changes=true" >> $GITHUB_OUTPUT
         else
           echo "has_preview_changes=false" >> $GITHUB_OUTPUT
+        fi
+
+        if [ $EXIT_CODE -ne 0 ]; then
+          "$GITHUB_ACTION_PATH/scripts/report-failure.sh" \
+            "locamorph upload --dryrun" "$EXIT_CODE" "$LOG"
+          exit $EXIT_CODE
         fi
 
     - name: Comment preview on PR

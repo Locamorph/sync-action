@@ -244,6 +244,21 @@ Translations added:
 | `pr_reviewers` | No | - | Comma-separated reviewer usernames |
 | `pr_assignees` | No | - | Comma-separated assignee usernames |
 
+## Required API key permissions
+
+| Action | Required permissions |
+|--------|----------------------|
+| `pull` | `projects:read`, `languages:read`, `translations:read` |
+| `pull-request` | `projects:read`, `languages:read`, `translations:read` |
+| `push` | `projects:read`, `languages:read`, `translations:write` |
+| `preview` | `projects:read`, `languages:read`, `translations:write` |
+
+> **`preview` needs write permission.** It runs `locamorph upload --dryrun`,
+> which still sends the request to the bulk translation update endpoint with a
+> `dryrun` flag. The server computes the diff and discards it without persisting
+> anything, but the request is authorized against the same `translations:write`
+> permission as a real upload. A read-only key cannot run `preview`.
+
 ## Outputs
 
 | Output | Description |
