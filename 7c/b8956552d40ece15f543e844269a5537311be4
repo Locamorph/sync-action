@@ -1,0 +1,49 @@
+README.md
+  s_dd2ebd10e5a1af::t_bd9224f87e91a8 219-236
+  s_dd2ebd10e5a1af::t_5bfc327f0b822c 277
+  s_dd2ebd10e5a1af::t_f0970869818aa6 253
+  s_dd2ebd10e5a1af::t_07a9915abf411a 197-199,214
+  s_dd2ebd10e5a1af::t_d3130656e9ed15 218
+  s_dd2ebd10e5a1af::t_3444f89eb9fc0a 237
+  s_dd2ebd10e5a1af::t_0d44d4613f8c52 215
+scripts/build-comment.js
+  s_dd2ebd10e5a1af::t_d3728707d1c29f 119,121
+  s_dd2ebd10e5a1af::t_145489f587bee6 53-58
+  s_dd2ebd10e5a1af::t_41016cc85df458 153-171
+  s_dd2ebd10e5a1af::t_f4df69ea46b69a 1-14,16-52,59-100,102-104,106-118,120,123-152,172-204
+  s_dd2ebd10e5a1af::t_20407a77d09ccf 15
+  s_dd2ebd10e5a1af::t_0f5509387cd4fa 101,105
+  s_dd2ebd10e5a1af::t_1d3d16b7a4f9f2 122
+  s_dd2ebd10e5a1af::t_18d99a95d786a7 205-213
+action.yml
+  s_dd2ebd10e5a1af::t_56d4fef28d063c 72
+  s_dd2ebd10e5a1af::t_849636ae379708 190-200,202-207,212-214
+  s_dd2ebd10e5a1af::t_ef66ca58a2bee8 57
+  s_dd2ebd10e5a1af::t_96306affdf8dcb 90-108
+  s_dd2ebd10e5a1af::t_81da77d0961abe 41-44
+  s_dd2ebd10e5a1af::t_8131179ecd5c09 89
+  s_dd2ebd10e5a1af::t_b5e7b0b995d273 160
+  s_dd2ebd10e5a1af::t_ee0ef20084deff 162-164,166-169,171-172,175,177-178,182-188
+  s_dd2ebd10e5a1af::t_ecd410ec92948b 189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "7cb8956552d40ece15f543e844269a5537311be4",
+  "prompts": {},
+  "humans": {
+    "h_f7877562ee6c86": {
+      "author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_dd2ebd10e5a1af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06e24d3e-c905-4190-aeca-c5191a2f77c9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  }
+}
