@@ -1,0 +1,21 @@
+scripts/build-comment.js
+  s_dd2ebd10e5a1af::t_a21ab17f873272 190-193
+action.yml
+  s_dd2ebd10e5a1af::t_ae2fd02dc211b2 185-192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3d6f41886956df5097505bf39d4d3fc1f6cd1668",
+  "prompts": {},
+  "sessions": {
+    "s_dd2ebd10e5a1af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06e24d3e-c905-4190-aeca-c5191a2f77c9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  }
+}
