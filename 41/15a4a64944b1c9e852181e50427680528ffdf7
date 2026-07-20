@@ -1,0 +1,32 @@
+scripts/report-failure.sh
+  s_dd2ebd10e5a1af::t_6ee55ef4e368be 1-78
+action.yml
+  s_dd2ebd10e5a1af::t_a054419c72c81d 95-101,110-111
+  s_dd2ebd10e5a1af::t_65b910afa43604 138,140-146,148,157-158
+  s_dd2ebd10e5a1af::t_fa9ed64d5bbea2 156,159
+  s_dd2ebd10e5a1af::t_5d158e0c622c11 109,112
+  s_dd2ebd10e5a1af::t_fad387a7a2b6ee 113-114,160-161
+README.md
+  s_dd2ebd10e5a1af::t_f46532cf3b677e 247-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4115a4a64944b1c9e852181e50427680528ffdf7",
+  "prompts": {},
+  "humans": {
+    "h_f7877562ee6c86": {
+      "author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_dd2ebd10e5a1af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06e24d3e-c905-4190-aeca-c5191a2f77c9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  }
+}
